@@ -1,6 +1,12 @@
-CREATE TABLE if not exists example_table (
-    id INT PRIMARY KEY,
-    name VARCHAR(255)
+CREATE TABLE IF NOT EXISTS `user` (
+                                      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                      `username` VARCHAR(255) NOT NULL UNIQUE,
+                                      `email` VARCHAR(255) NOT NULL UNIQUE,
+                                      `password_hash` CHAR(60) NOT NULL,
+                                      `country` ENUM('Turkey', 'United States', 'United Kingdom', 'France', 'Germany') NOT NULL,
+                                      `level` INT NOT NULL DEFAULT 1,
+                                      `coins` INT NOT NULL DEFAULT 5000,
+                                      `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                      `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                      PRIMARY KEY (`id`)
 );
-
-INSERT INTO `example_table` (`id`, `name`) VALUES (1, 'example-1'), (2, 'example-2');

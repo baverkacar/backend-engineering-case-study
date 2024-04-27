@@ -20,6 +20,8 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: 'mysql-db'
+      MYSQL_ROOT_USERNAME: 'root'
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     networks:
       - 'local-network'
