@@ -11,6 +11,8 @@ services:
       - '8080:8080'
     networks:
       - 'local-network'
+    environment:
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
 
   mysqldb:
     image: mysql:8.0.28-oracle
@@ -18,15 +20,13 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: 'mysql-db'
-      MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     networks:
       - 'local-network'
     ports:
       - '3306:3306'
     volumes:
-      - case-mysql-data:/var/lib/case-mysqldb
+      - case-mysql-data:/var/lib/mysql
       - ./mysql-db-dump.sql:/docker-entrypoint-initdb.d/mysql-db-dump.sql:ro
 
 volumes:
