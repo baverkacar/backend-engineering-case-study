@@ -1,12 +1,12 @@
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE IF NOT EXISTS `users` (
                                       `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
                                       `username` VARCHAR(255) NOT NULL UNIQUE,
                                       `email` VARCHAR(255) NOT NULL UNIQUE,
-                                      `password_hash` CHAR(60) NOT NULL,
-                                      `country` ENUM('Turkey', 'United States', 'United Kingdom', 'France', 'Germany') NOT NULL,
-                                      `level` INT NOT NULL DEFAULT 1,
-                                      `coins` INT NOT NULL DEFAULT 5000,
-                                      `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                      `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                      `password` CHAR(60) NOT NULL,
+                                      `country` VARCHAR(255) NOT NULL,
+                                      `level` INT DEFAULT 1,
+                                      `coins` INT DEFAULT 5000,
+                                      `created_at` TIMESTAMP DEFAULT NOW(),
+                                      `updated_at` TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
                                       PRIMARY KEY (`id`)
 );
