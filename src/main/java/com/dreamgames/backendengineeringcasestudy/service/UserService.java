@@ -5,5 +5,5 @@ import com.dreamgames.backendengineeringcasestudy.model.user.UserProgressRespons
 
 public interface UserService {
     UserProgressResponse createUser(CreateUserRequest request);
-
+    UserProgressResponse updateLevelAndCoins(Long id);
 }

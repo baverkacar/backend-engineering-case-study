@@ -4,11 +4,9 @@ import com.dreamgames.backendengineeringcasestudy.domain.User;
 import com.dreamgames.backendengineeringcasestudy.model.user.CreateUserRequest;
 import com.dreamgames.backendengineeringcasestudy.model.user.UserProgressResponse;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class UserMapperTest {
 
-    @Mock
+    @InjectMocks
     UserMapper userMapper;
 
     @Test
