@@ -1,8 +1,10 @@
 package com.dreamgames.backendengineeringcasestudy.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,17 +17,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(UserController.class)
-@AutoConfigureWebClient
+@ExtendWith(MockitoExtension.class)
+@WebMvcTest(controllers = UserController.class)
+@AutoConfigureMockMvc
 public class UserControllerTest {
 
     @Autowired
@@ -39,7 +42,7 @@ public class UserControllerTest {
 
 
     private final String CONTENT_TYPE = "application/json";
-    private final String URL = "/users";
+    private final String URL = "/users/";
 
 
     @Test
@@ -57,7 +60,7 @@ public class UserControllerTest {
                 .build();
         // when
         when(userService.createUser(createUserRequest)).thenReturn(userProgressResponse);
-        ResultActions actions = mockMvc.perform(post(URL + "/create")
+        ResultActions actions = mockMvc.perform(post(URL + "create")
                 .contentType(CONTENT_TYPE)
                 .content(objectMapper.writeValueAsString(createUserRequest))
         );
@@ -75,6 +78,29 @@ public class UserControllerTest {
                 jsonPath("$.level").value(1),
                 jsonPath("$.coins").value(500),
                 jsonPath("$.country").value("FRANCE")
+        );
+    }
+
+    @Test
+    public void updateLevelAndCoins_ShouldReturnUpdatedUserProgress() throws Exception {
+        // Given
+        Long userId = 1L;
+        UserProgressResponse userProgressResponse = new UserProgressResponse();
+        userProgressResponse.setId(userId);
+        userProgressResponse.setLevel(21);
+        userProgressResponse.setCoins(1025);
+
+        given(userService.updateLevelAndCoins(userId)).willReturn(userProgressResponse);
+
+        // When
+        ResultActions result = mockMvc.perform((RequestBuilder) patch(URL + userId + "/level-up"));
+        // The
+        verify(userService, Mockito.times(1)).updateLevelAndCoins(userId);
+        result.andExpectAll(
+                status().isOk(),
+                jsonPath("$.id").value(userId.intValue()),
+                jsonPath("$.level").value(21),
+                jsonPath("$.coins").value(1025)
         );
     }
 }
