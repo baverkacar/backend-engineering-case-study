@@ -4,14 +4,15 @@ import com.dreamgames.backendengineeringcasestudy.domain.Tournament;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TournamentScheduler {
     private final TournamentRepository tournamentRepository;
 
@@ -23,6 +24,7 @@ public class TournamentScheduler {
         newTournament.setEndTime(LocalDateTime.now().plusHours(20));
         newTournament.setStatus("Active");
         tournamentRepository.save(newTournament);
+        log.info("[TOURNAMENT SCHEDULER] New tournament created");
     }
 
     @Scheduled(cron = "0 0 20 * * ?") // 8pm
@@ -33,5 +35,6 @@ public class TournamentScheduler {
             activeTournament.setStatus("Completed");
             tournamentRepository.save(activeTournament);
         }
+        // TODO: Buraya reward logic'ini ekle. Async olacak.
     }
 }
