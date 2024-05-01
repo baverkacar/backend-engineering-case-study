@@ -1,4 +1,4 @@
-package com.dreamgames.backendengineeringcasestudy.exception.user;
+package com.dreamgames.backendengineeringcasestudy.exception;
 
 public class UserNotFoundException extends RuntimeException{
     public UserNotFoundException(String msg) {

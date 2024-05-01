@@ -13,6 +13,9 @@ services:
       - 'local-network'
     environment:
       - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      - mysqldb
+      - redis
 
   mysqldb:
     image: mysql:8.0.28-oracle
@@ -21,8 +24,8 @@ services:
     environment:
       MYSQL_DATABASE: 'mysql-db'
       MYSQL_ROOT_USERNAME: 'root'
-      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: 'Bavkcr58-'
+      MYSQL_ROOT_PASSWORD: 'Bavkcr58-'
     networks:
       - 'local-network'
     ports:
@@ -30,6 +33,14 @@ services:
     volumes:
       - case-mysql-data:/var/lib/mysql
       - ./mysql-db-dump.sql:/docker-entrypoint-initdb.d/mysql-db-dump.sql:ro
+
+  redis:
+    image: redis:latest
+    container_name: redis-server
+    ports:
+      - '6379:6379'
+    networks:
+      - 'local-network'
 
 volumes:
   case-mysql-data:

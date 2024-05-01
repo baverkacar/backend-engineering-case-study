@@ -37,7 +37,7 @@ public class UserMapperTest {
     @Test
     public void testUserToUserProgressResponse() {
         User user = User.builder()
-                .id(1L)
+                .userId(1L)
                 .username("testUser")
                 .email("test@example.com")
                 .country("TURKEY") // Adjust depending on your Country enum and User class configuration
