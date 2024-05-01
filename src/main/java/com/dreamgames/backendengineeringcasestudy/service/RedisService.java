@@ -15,4 +15,6 @@ public interface RedisService {
     Set<ZSetOperations.TypedTuple<String>> getGroupLeaderBoard(Long groupId);
     void addCountryToGroup(String groupCountryKey, String country);
     boolean canUserJoinGroup(Long groupId, String country);
+    void incrementCountryLeaderBoardScore(String country, int scoreIncrement, Long tournamentId);
+    void incrementGroupLeaderBoardScore(Long groupId, Long id, int i);
 }

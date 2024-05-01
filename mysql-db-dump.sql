@@ -60,13 +60,13 @@ VALUES
     ('user4', 'user4@email.com', 'hashed_password', 'FRANCE', 21, 1100, NOW(), NOW()),
     ('user5', 'user5@email.com', 'hashed_password', 'GERMANY', 24, 1600, NOW(), NOW()),
     ('user6', 'user6@email.com', 'hashed_password', 'GERMANY', 20, 1500, NOW(), NOW()),
-    ('user7', 'user7@email.com', 'hashed_password', 'UNITED KINGDOM', 25, 1400, NOW(), NOW()),
-    ('user8', 'user8@email.com', 'hashed_password', 'UNITED KINGDOM', 20, 1300, NOW(), NOW()),
+    ('user7', 'user7@email.com', 'hashed_password', 'UNITED_KINGDOM', 25, 1400, NOW(), NOW()),
+    ('user8', 'user8@email.com', 'hashed_password', 'UNITED_KINGDOM', 20, 1300, NOW(), NOW()),
     ('user9', 'user9@email.com', 'hashed_password', 'UNITED_STATES', 20, 1800, NOW(), NOW()),
-    ('user10', 'user10@email.com', 'hashed_password', 'TURKEY', 20, 1600, NOW(), NOW());
+    ('user10', 'user10@email.com', 'hashed_password', 'UNITED_STATES', 20, 1600, NOW(), NOW());
 
 INSERT INTO users (username, email, password, country, level, coins, created_at, updated_at)
-VALUES ('lowleveluser', 'lowleveluser@email.com', 'hashed_password', 'Turkey', 15, 900, NOW(), NOW());
+VALUES ('lowleveluser', 'lowleveluser@email.com', 'hashed_password', 'TURKEY', 15, 900, NOW(), NOW());
 
 -- INSERT INTO tournaments (start_time, end_time, status)
 -- VALUES ('2024-04-30 00:00:00', '2024-04-30 20:00:00', 'Completed');
