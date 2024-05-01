@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.dreamgames.backendengineeringcasestudy.domain.User;
-import com.dreamgames.backendengineeringcasestudy.exception.user.UserExistsException;
-import com.dreamgames.backendengineeringcasestudy.exception.user.UserNotFoundException;
+import com.dreamgames.backendengineeringcasestudy.exception.UserExistsException;
+import com.dreamgames.backendengineeringcasestudy.exception.UserNotFoundException;
 import com.dreamgames.backendengineeringcasestudy.mapper.UserMapper;
 import com.dreamgames.backendengineeringcasestudy.model.user.CreateUserRequest;
 import com.dreamgames.backendengineeringcasestudy.model.user.UserProgressResponse;
@@ -83,9 +83,7 @@ public class UserServiceTest {
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
         // When & Then
-        Exception exception = assertThrows(UserNotFoundException.class, () -> {
-            userService.updateLevelAndCoins(userId);
-        });
+        Exception exception = assertThrows(UserNotFoundException.class, () -> userService.updateLevelAndCoins(userId));
 
         assertEquals("No user found with id: " + userId, exception.getMessage());
     }

@@ -1,8 +1,8 @@
 package com.dreamgames.backendengineeringcasestudy.service.impl;
 
 import com.dreamgames.backendengineeringcasestudy.domain.User;
-import com.dreamgames.backendengineeringcasestudy.exception.user.UserExistsException;
-import com.dreamgames.backendengineeringcasestudy.exception.user.UserNotFoundException;
+import com.dreamgames.backendengineeringcasestudy.exception.UserExistsException;
+import com.dreamgames.backendengineeringcasestudy.exception.UserNotFoundException;
 import com.dreamgames.backendengineeringcasestudy.mapper.UserMapper;
 import com.dreamgames.backendengineeringcasestudy.model.user.CreateUserRequest;
 import com.dreamgames.backendengineeringcasestudy.model.user.UserProgressResponse;
