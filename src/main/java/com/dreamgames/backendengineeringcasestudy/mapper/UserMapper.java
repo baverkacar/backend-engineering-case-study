@@ -32,7 +32,7 @@ public class UserMapper {
 
     public UserProgressResponse UserToUserProgressResponse(User user) {
         return UserProgressResponse.builder()
-                .id(user.getId())
+                .id(user.getUserId())
                 .level(user.getLevel())
                 .coins(user.getCoins())
                 .country(user.getCountry())

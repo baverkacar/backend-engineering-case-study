@@ -12,7 +12,6 @@ import com.dreamgames.backendengineeringcasestudy.mapper.UserMapper;
 import com.dreamgames.backendengineeringcasestudy.model.user.CreateUserRequest;
 import com.dreamgames.backendengineeringcasestudy.model.user.UserProgressResponse;
 import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -96,7 +95,7 @@ public class UserServiceTest {
         // Given
         Long userId = 1L;
         User mockUser = new User();
-        mockUser.setId(userId);
+        mockUser.setUserId(userId);
         mockUser.setLevel(1);
         mockUser.setCoins(100);
         mockUser.setUpdatedAt(LocalDateTime.now());

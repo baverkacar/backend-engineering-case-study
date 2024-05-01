@@ -6,38 +6,33 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-
+@Entity
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Entity
 @Data
-@Table(name = "users")
+@Table(name = "tournament_rewards")
 @Getter
 @Setter
-public class User implements Serializable {
+public class TournamentRewards implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long rewardId;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @ManyToOne(targetEntity = Tournament.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "tournament_id")
+    private Tournament tournament;
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
-    private String country;
-
-    @Column(nullable = false)
-    private Integer level;
+    @Column
+    private Integer coinsWon;
 
     @Column(nullable = false)
-    private Integer coins;
+    private Boolean claimed;
 
     @Column(name = "created_at", updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT NOW()")
     private LocalDateTime createdAt;

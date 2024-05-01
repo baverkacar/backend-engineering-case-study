@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
                     throw new UserExistsException(String.format("Username already exists with given username: %s", request.getUsername()));
                 });
         User createdUser = userRepository.save(userMapper.CreateUserRequestToUser(request));
-        log.info("[USER SERVICE] User created with given id: {}", createdUser.getId());
+        log.info("[USER SERVICE] User created with given id: {}", createdUser.getUserId());
         return userMapper.UserToUserProgressResponse(createdUser);
     }
 
