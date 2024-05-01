@@ -140,6 +140,35 @@ public class RedisServiceImpl implements RedisService {
         return isMember != null && !isMember;
     }
 
+    /**
+     * Increments the score for a user in a specific group's leaderboard.
+     * This method adds a specified increment to the user's score in the group leaderboard, managed in Redis.
+     *
+     * @param groupId The ID of the group whose leaderboard is being updated.
+     * @param userId The ID of the user whose score is to be incremented.
+     * @param scoreIncrement The amount by which the user's score should be incremented.
+     * @throws IllegalArgumentException if any of the parameters are null or the score increment is negative.
+     */
+    public void incrementGroupLeaderBoardScore(Long groupId, Long userId, int scoreIncrement) {
+        String groupLeaderBoardKey = "groupLeaderBoard:" + groupId;
+        redisTemplate.opsForZSet().incrementScore(groupLeaderBoardKey, "User:"+ userId, scoreIncrement);
+        log.info("Incremented score for user {} in group {} by {}", userId, groupId, scoreIncrement);
+    }
+
+    /**
+     * Increments the score for a country in the overall country leaderboard.
+     * This method adds a specified increment to the country's score in the leaderboard, which is managed in Redis.
+     *
+     * @param country The name of the country whose score is to be incremented.
+     * @param scoreIncrement The amount by which the country's score should be incremented.
+     * @throws IllegalArgumentException if the country parameter is null or the score increment is negative.
+     */
+    public void incrementCountryLeaderBoardScore(String country, int scoreIncrement,Long tournamentId) {
+        String countryLeaderBoardKey = "countryLeaderBoard:"+ tournamentId;
+        redisTemplate.opsForZSet().incrementScore(countryLeaderBoardKey, country, scoreIncrement);
+        log.info("Incremented score for country {} by {}", country, scoreIncrement);
+    }
+
     private void setActiveTournament(boolean isActive) {
         redisTemplate.opsForValue().set("hasActiveTournament", String.valueOf(isActive));
     }
