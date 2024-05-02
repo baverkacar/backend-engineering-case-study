@@ -1,9 +1,6 @@
 package com.dreamgames.backendengineeringcasestudy.controller.advice;
 
-import com.dreamgames.backendengineeringcasestudy.exception.UserCanNotEnterTournamentException;
-import com.dreamgames.backendengineeringcasestudy.exception.UserEnteredTournamentBeforeException;
-import com.dreamgames.backendengineeringcasestudy.exception.UserExistsException;
-import com.dreamgames.backendengineeringcasestudy.exception.UserNotFoundException;
+import com.dreamgames.backendengineeringcasestudy.exception.*;
 import com.dreamgames.backendengineeringcasestudy.model.ExceptionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +51,7 @@ public class ControllerExceptionHandler {
      * @return A ResponseEntity containing an ExceptionModel detailing the exception and the corresponding HTTP status.
      */
     @ExceptionHandler(value = UserCanNotEnterTournamentException.class)
-    public ResponseEntity<ExceptionModel> handleUserNotFoundException(UserCanNotEnterTournamentException userCanNotEnterTournamentException){
+    public ResponseEntity<ExceptionModel> handleUserCanNotEnterTournamentException(UserCanNotEnterTournamentException userCanNotEnterTournamentException){
         HttpStatus exceptionStatus = HttpStatus.BAD_REQUEST;
         ExceptionModel exceptionDTO = ExceptionModel.convertExceptionToExceptionDTO(exceptionStatus, userCanNotEnterTournamentException.getMessage());
         return new ResponseEntity<>(exceptionDTO, exceptionStatus);
@@ -68,9 +65,54 @@ public class ControllerExceptionHandler {
      * @return A ResponseEntity containing an ExceptionModel detailing the exception and the corresponding HTTP status.
      */
     @ExceptionHandler(value = UserEnteredTournamentBeforeException.class)
-    public ResponseEntity<ExceptionModel> handleUserNotFoundException(UserEnteredTournamentBeforeException userEnteredTournamentBeforeException){
+    public ResponseEntity<ExceptionModel> handleUserEnteredTournamentBeforeException(UserEnteredTournamentBeforeException userEnteredTournamentBeforeException){
         HttpStatus exceptionStatus = HttpStatus.CONFLICT;
         ExceptionModel exceptionDTO = ExceptionModel.convertExceptionToExceptionDTO(exceptionStatus, userEnteredTournamentBeforeException.getMessage());
+        return new ResponseEntity<>(exceptionDTO, exceptionStatus);
+    }
+
+
+    /**
+     * Handles exceptions when a user has not entered a tournament.
+     * Returns a response with HTTP status NOT_FOUND.
+     *
+     * @param userDidNotEnteredTournamentException the exception thrown when user did not enter the tournament
+     * @return a {@link ResponseEntity} containing the exception details and HTTP status NOT_FOUND
+     */
+    @ExceptionHandler(value = UserDidNotEnteredTournamentException.class)
+    public ResponseEntity<ExceptionModel> handleUserDidNotEnteredTournamentException(UserDidNotEnteredTournamentException userDidNotEnteredTournamentException){
+        HttpStatus exceptionStatus = HttpStatus.NOT_FOUND;
+        ExceptionModel exceptionDTO = ExceptionModel.convertExceptionToExceptionDTO(exceptionStatus, userDidNotEnteredTournamentException.getMessage());
+        return new ResponseEntity<>(exceptionDTO, exceptionStatus);
+    }
+
+    /**
+     * Handles exceptions when a user has not entered a tournament.
+     * Returns a response with HTTP status NOT_FOUND.
+     *
+     * @param noActiveTournamentException the exception thrown when user did not enter the tournament
+     * @return a {@link ResponseEntity} containing the exception details and HTTP status NOT_FOUND
+     */
+    @ExceptionHandler(value = NoActiveTournamentException.class)
+    public ResponseEntity<ExceptionModel> handleNoActiveTournamentException(NoActiveTournamentException noActiveTournamentException){
+        HttpStatus exceptionStatus = HttpStatus.NOT_FOUND;
+        ExceptionModel exceptionDTO = ExceptionModel.convertExceptionToExceptionDTO(exceptionStatus, noActiveTournamentException.getMessage());
+        return new ResponseEntity<>(exceptionDTO, exceptionStatus);
+    }
+
+
+    /**
+     * Handles exceptions when unclaimed rewards are found for a user.
+     * This handler captures the {@link UnClaimedRewardFoundException} and returns an appropriate response.
+     *
+     * @param unClaimedRewardFoundException the exception that was thrown when unclaimed rewards are detected.
+     * @return a {@link ResponseEntity} containing the {@link ExceptionModel} which encapsulates error details,
+     *         including a message explaining the error and the HTTP status code.
+     */
+    @ExceptionHandler(value = UnClaimedRewardFoundException.class)
+    public ResponseEntity<ExceptionModel> handleUnClaimedRewardFoundException(UnClaimedRewardFoundException unClaimedRewardFoundException){
+        HttpStatus exceptionStatus = HttpStatus.BAD_REQUEST;
+        ExceptionModel exceptionDTO = ExceptionModel.convertExceptionToExceptionDTO(exceptionStatus, unClaimedRewardFoundException.getMessage());
         return new ResponseEntity<>(exceptionDTO, exceptionStatus);
     }
 }

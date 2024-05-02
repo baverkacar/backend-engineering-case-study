@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,6 +21,9 @@ public interface GroupInfoRepository extends JpaRepository<GroupInfo, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE GroupInfo gi SET gi.hasGroupBegun = true WHERE gi.group.groupId = :groupId")
+    @Query("UPDATE GroupInfo gi SET gi.hasGroupBegan = true WHERE gi.group.groupId = :groupId")
     void updateHasGroupBegunForAllOccurrences(@Param("groupId") Long groupId);
+
+    @Query("SELECT gi FROM GroupInfo gi WHERE gi.group.tournament.tournamentId = :tournamentId AND gi.hasGroupBegan = TRUE")
+    List<GroupInfo> findByTournamentIdAndGroupBegun(@Param("tournamentId") Long tournamentId);
 }

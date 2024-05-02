@@ -1,5 +1,6 @@
 package com.dreamgames.backendengineeringcasestudy.service.impl;
 
+import com.dreamgames.backendengineeringcasestudy.exception.NoActiveTournamentException;
 import com.dreamgames.backendengineeringcasestudy.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,13 @@ public class RedisServiceImpl implements RedisService {
 
     private final StringRedisTemplate redisTemplate;
 
+
+    /**
+     * Activates a tournament by setting it as active and storing its ID in Redis.
+     * This method marks the tournament as active in Redis and logs the creation of the tournament.
+     *
+     * @param tournamentId The ID of the tournament being activated.
+     */
     @Override
     public void createTournament(Long tournamentId) {
         setActiveTournament(true);
@@ -65,11 +73,16 @@ public class RedisServiceImpl implements RedisService {
         log.info("[REDIS SERVICE] Daily tournament is now NOT active");
     }
 
+    /**
+     * Checks if there is an active tournament available.
+     * If no active tournament is found in Redis, it throws a NoActiveTournamentException.
+     *
+     * @throws NoActiveTournamentException if no active tournament is currently stored in Redis.
+     */
     @Override
     public void checkActiveTournament() {
         if (!hasActiveTournament()) {
-            throw new IllegalStateException("There is no active tournament right now."); // TODO: CUSTOM EXCEPTION
-        }
+            throw new NoActiveTournamentException("There is no active tournament");        }
     }
 
     /**
@@ -81,7 +94,6 @@ public class RedisServiceImpl implements RedisService {
     public Long getActiveTournamentId() {
         String id = redisTemplate.opsForValue().get("activeTournamentId");
         return id != null ? Long.parseLong(id) : null;    }
-
 
     /**
      * Closes the currently active tournament in Redis by clearing the tournament's active flag.
@@ -153,6 +165,40 @@ public class RedisServiceImpl implements RedisService {
         String groupLeaderBoardKey = "groupLeaderBoard:" + groupId;
         redisTemplate.opsForZSet().incrementScore(groupLeaderBoardKey, "User:"+ userId, scoreIncrement);
         log.info("Incremented score for user {} in group {} by {}", userId, groupId, scoreIncrement);
+    }
+
+    /**
+     * Retrieves the country leaderboard from Redis based on the specified leaderboard key.
+     * This method fetches the scores in descending order to give the leaderboard from highest to lowest scores.
+     *
+     * @param leaderboardKey The Redis key for the leaderboard.
+     * @return A set of TypedTuple containing country names and their scores.
+     */
+    @Override
+    public Set<ZSetOperations.TypedTuple<String>> getCountryLeaderBoard(String leaderboardKey) {
+        return redisTemplate.opsForZSet().reverseRangeWithScores(leaderboardKey, 0, -1);
+    }
+
+    /**
+     * Retrieves the rank of a user in a group's leaderboard.
+     * This method fetches the user's rank from Redis and adjusts the rank to be 1-indexed.
+     * If the user is not found in the leaderboard, an exception is thrown.
+     *
+     * @param groupId The group ID whose leaderboard is queried.
+     * @param userId The user ID whose rank is to be retrieved.
+     * @return The rank of the user in the leaderboard, adjusted to be 1-indexed.
+     * @throws IllegalStateException if the user's rank cannot be found.
+     */
+    @Override
+    public Integer getRankOfUserInGroupLeaderBoard(Long groupId, Long userId) {
+        String leaderboardKey = "groupLeaderBoard:" + groupId;
+        Long rank = redisTemplate.opsForZSet().reverseRank(leaderboardKey, "User:"+ userId);
+
+        if (rank == null) {
+            throw new IllegalStateException("User's rank could not be found in the group leaderboard.");
+        }
+
+        return rank.intValue() + 1;
     }
 
     /**

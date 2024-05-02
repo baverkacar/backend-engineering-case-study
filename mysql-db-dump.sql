@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `group_info` (
                                             `group_id` BIGINT,
                                             `user_id` BIGINT,
                                             `score` INT DEFAULT 0,
-                                            `has_group_begun` BOOLEAN NOT NULL DEFAULT FALSE,
+                                            `has_group_began` BOOLEAN NOT NULL DEFAULT FALSE,
                                             `created_at` TIMESTAMP DEFAULT NOW(),
                                             `updated_at` TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
                                             FOREIGN KEY (`group_id`) REFERENCES `tournament_groups`(`group_id`),

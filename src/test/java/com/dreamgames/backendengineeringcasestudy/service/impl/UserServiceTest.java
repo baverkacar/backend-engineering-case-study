@@ -5,13 +5,17 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
+import com.dreamgames.backendengineeringcasestudy.domain.GroupInfo;
+import com.dreamgames.backendengineeringcasestudy.domain.TournamentGroups;
 import com.dreamgames.backendengineeringcasestudy.domain.User;
 import com.dreamgames.backendengineeringcasestudy.exception.UserExistsException;
 import com.dreamgames.backendengineeringcasestudy.exception.UserNotFoundException;
 import com.dreamgames.backendengineeringcasestudy.mapper.UserMapper;
 import com.dreamgames.backendengineeringcasestudy.model.user.CreateUserRequest;
 import com.dreamgames.backendengineeringcasestudy.model.user.UserProgressResponse;
+import com.dreamgames.backendengineeringcasestudy.repository.GroupInfoRepository;
 import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
+import com.dreamgames.backendengineeringcasestudy.service.RedisService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +30,12 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private GroupInfoRepository groupInfoRepository;
+
+    @Mock
+    private RedisService redisService;
 
     @Mock
     private UserMapper userMapper;
@@ -78,7 +88,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldThrowUserNotFoundExceptionWhenUserDoesNotExist() {
+    void shouldThrowUserNotFoundExceptionWhenUserDoesNotExist() {
         Long userId = 1L;
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
@@ -89,29 +99,42 @@ public class UserServiceTest {
     }
 
     @Test
-    void updateLevelAndCoins_Successful() {
-        // Given
-        Long userId = 1L;
-        User mockUser = new User();
-        mockUser.setUserId(userId);
-        mockUser.setLevel(1);
-        mockUser.setCoins(100);
-        mockUser.setUpdatedAt(LocalDateTime.now());
+    void testUpdateLevelAndCoinsWithoutActiveTournament() {
+        // Arrange
+        User user = new User(1L, "TestUser", "test@example.com", "pass", "TestCountry", 1, 5000, LocalDateTime.now(), LocalDateTime.now());
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(redisService.getActiveTournamentId()).thenReturn(null);
 
-        UserProgressResponse expectedResponse = new UserProgressResponse();
-        expectedResponse.setLevel(2);
-        expectedResponse.setCoins(125);
+        // Act
+        userService.updateLevelAndCoins(user.getUserId());
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-        when(userMapper.UserToUserProgressResponse(mockUser)).thenReturn(expectedResponse);
+        // Assert
+        assertEquals(2, user.getLevel());
+        assertEquals(5025, user.getCoins());
+        verify(userRepository, times(1)).save(user);
+        verify(redisService, times(1)).checkActiveTournament();
+        verifyNoMoreInteractions(redisService);
+    }
 
-        // When
-        UserProgressResponse actualResponse = userService.updateLevelAndCoins(userId);
+    @Test
+    void testUpdateLevelAndCoinsWithActiveTournament() {
+        // Arrange
+        User user = new User(1L, "TestUser", "test@example.com", "pass", "TestCountry", 1, 5000, LocalDateTime.now(), LocalDateTime.now());
+        GroupInfo groupInfo = new GroupInfo(1L, TournamentGroups.builder().build(), user, 0, true, LocalDateTime.now(), LocalDateTime.now());
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(redisService.getActiveTournamentId()).thenReturn(1L);
+        when(groupInfoRepository.findByTournamentIdAndUserId(any(), any())).thenReturn(Optional.of(groupInfo));
+        when(userMapper.UserToUserProgressResponse(any())).thenReturn(new UserProgressResponse());
 
-        // Then
-        assertEquals(2, actualResponse.getLevel());
-        assertEquals(125, actualResponse.getCoins());
-        verify(userRepository).save(mockUser);
-        verify(userMapper).UserToUserProgressResponse(mockUser);
+        // Act
+        userService.updateLevelAndCoins(user.getUserId());
+
+        // Assert
+        assertEquals(2, user.getLevel());
+        assertEquals(5025, user.getCoins());
+        assertEquals(1, groupInfo.getScore());
+        verify(groupInfoRepository, times(1)).save(groupInfo);
+        verify(redisService, times(1)).incrementGroupLeaderBoardScore(any(), any(), anyInt());
+        verify(redisService, times(1)).incrementCountryLeaderBoardScore(any(), anyInt(), any());
     }
 }

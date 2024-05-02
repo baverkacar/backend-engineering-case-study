@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "tournament_rewards")
 @Getter
 @Setter
-public class TournamentRewards implements Serializable {
+public class TournamentRewards {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

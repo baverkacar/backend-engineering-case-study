@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
         Optional<GroupInfo> optionalGroupInfo = groupInfoRepository.findByTournamentIdAndUserId(tournamentId, id);
         if (optionalGroupInfo.isPresent()) {
             GroupInfo groupInfo = optionalGroupInfo.get();
-            if (groupInfo.getHasGroupBegun()) {
+            if (groupInfo.getHasGroupBegan()) {
                 groupInfo.setScore(groupInfo.getScore() + 1);
                 groupInfo.setUpdatedAt(LocalDateTime.now());
                 groupInfoRepository.save(groupInfo);
