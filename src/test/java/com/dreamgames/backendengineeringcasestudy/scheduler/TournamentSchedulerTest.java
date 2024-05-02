@@ -1,10 +1,9 @@
 package com.dreamgames.backendengineeringcasestudy.scheduler;
 
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
-import com.dreamgames.backendengineeringcasestudy.domain.Tournament;
-import com.dreamgames.backendengineeringcasestudy.repository.TournamentRepository;
+import com.dreamgames.backendengineeringcasestudy.service.RedisService;
+import com.dreamgames.backendengineeringcasestudy.service.TournamentService;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,29 +15,39 @@ public class TournamentSchedulerTest {
 
     @InjectMocks
     private TournamentScheduler scheduler;
+
     @Mock
-    private TournamentRepository tournamentRepository;
+    private TournamentService tournamentService;
+
+    @Mock
+    private RedisService redisService;
 
 
     @Test
-    public void testCreateTournament() {
+    public void testCreateTournamentScheduler() {
+        // Arrange
+        Long expectedTournamentId = 1L;
+        when(tournamentService.createTournament()).thenReturn(expectedTournamentId);
 
+        // Act
         scheduler.createTournament();
-        verify(tournamentRepository, times(1)).save(any(Tournament.class));
+
+        // Assert
+        verify(tournamentService, times(1)).createTournament();
+        verify(redisService, times(1)).createTournament(expectedTournamentId);
+        verify(redisService, times(1)).createCountryLeaderBoard(expectedTournamentId);
+        verifyNoMoreInteractions(tournamentService, redisService);
     }
 
     @Test
-    public void testCloseTournament() {
-        Tournament activeTournament = new Tournament();
-        activeTournament.setTournamentId(1L);
-        activeTournament.setStatus("Active");
-
-        when(tournamentRepository.findFirstByStatus("Active")).thenReturn(activeTournament);
-
+    public void testCloseTournamentScheduler() {
+        // Act
         scheduler.closeTournament();
 
-        verify(tournamentRepository, times(1)).save(activeTournament);
-        assertEquals("Completed", activeTournament.getStatus());
-
+        // Assert
+        verify(tournamentService, times(1)).specifyRewardWinners();
+        verify(tournamentService, times(1)).closeTournament();
+        verify(redisService, times(1)).closeTournament();
+        verifyNoMoreInteractions(tournamentService, redisService);
     }
 }

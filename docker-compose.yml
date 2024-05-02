@@ -4,6 +4,7 @@ services:
   app:
     image: backend-engineering-case-study:1.0
     container_name: backend-engineering-case-study
+    restart: on-failure
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,9 +16,11 @@ services:
       - mysqldb
       - redis
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/mysql-db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: Bavkcr58-
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
+
+
 
   mysqldb:
     image: mysql:8.0.28-oracle
@@ -25,9 +28,9 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: 'mysql-db'
-      MYSQL_ROOT_USERNAME: 'root'
-      MYSQL_PASSWORD: 'Bavkcr58-'
-      MYSQL_ROOT_PASSWORD: 'Bavkcr58-'
+      MYSQL_ROOT_USERNAME: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
     networks:
       - 'local-network'
     ports:

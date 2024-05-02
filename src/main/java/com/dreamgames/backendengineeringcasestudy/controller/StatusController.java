@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class StatusController {
-    private final TournamentService tournamentService;
 
     @GetMapping("/status")
     public String status() {
