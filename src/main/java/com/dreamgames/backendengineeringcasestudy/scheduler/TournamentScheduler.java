@@ -16,21 +16,23 @@ public class TournamentScheduler {
     private final TournamentService tournamentService;
     private final RedisService redisService;
 
-    @Scheduled(cron = "0 0 0 * * ?") // Midnight
+    @Scheduled(cron = "0 0 0 * * ?") // 00.00 UTC
     @Transactional
     public void createTournament() {
+        log.info("CREATE TOURNAMENT SCHEDULER START");
         Long tournamentId  = tournamentService.createTournament();
-
         redisService.createTournament(tournamentId);
         redisService.createCountryLeaderBoard(tournamentId);
-
+        log.info("CREATE TOURNAMENT SCHEDULER END");
     }
 
-    @Scheduled(cron = "0 0 20 * * ?") // 8pm
+    @Scheduled(cron = "0 0 20 * * ?") // 20.00 UTC
     @Transactional
     public void closeTournament() {
+        log.info("CLOSE TOURNAMENT SCHEDULER START");
+        tournamentService.specifyRewardWinners();
         tournamentService.closeTournament();
         redisService.closeTournament();
-        // TODO: Buraya reward logic'ini ekle. Async olacak.
+        log.info("CLOSE TOURNAMENT SCHEDULER END");
     }
 }

@@ -39,5 +39,6 @@ public class TournamentSchedulerTest {
 
         verify(tournamentRepository, times(1)).save(activeTournament);
         assertEquals("Completed", activeTournament.getStatus());
+
     }
 }

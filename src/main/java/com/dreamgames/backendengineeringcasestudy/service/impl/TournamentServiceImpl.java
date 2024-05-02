@@ -1,27 +1,26 @@
 package com.dreamgames.backendengineeringcasestudy.service.impl;
 
-import com.dreamgames.backendengineeringcasestudy.domain.GroupInfo;
-import com.dreamgames.backendengineeringcasestudy.domain.Tournament;
-import com.dreamgames.backendengineeringcasestudy.domain.TournamentGroups;
-import com.dreamgames.backendengineeringcasestudy.domain.User;
+import com.dreamgames.backendengineeringcasestudy.domain.*;
+import com.dreamgames.backendengineeringcasestudy.exception.UnClaimedRewardFoundException;
 import com.dreamgames.backendengineeringcasestudy.exception.UserCanNotEnterTournamentException;
 import com.dreamgames.backendengineeringcasestudy.exception.UserEnteredTournamentBeforeException;
 import com.dreamgames.backendengineeringcasestudy.exception.UserNotFoundException;
 import com.dreamgames.backendengineeringcasestudy.model.leaderboard.GroupLeaderBoard;
-import com.dreamgames.backendengineeringcasestudy.repository.GroupInfoRepository;
-import com.dreamgames.backendengineeringcasestudy.repository.TournamentGroupsRepository;
-import com.dreamgames.backendengineeringcasestudy.repository.TournamentRepository;
-import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
+import com.dreamgames.backendengineeringcasestudy.repository.*;
 import com.dreamgames.backendengineeringcasestudy.service.LeaderBoardService;
 import com.dreamgames.backendengineeringcasestudy.service.RedisService;
 import com.dreamgames.backendengineeringcasestudy.service.TournamentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +34,7 @@ public class TournamentServiceImpl implements TournamentService {
     private final TournamentGroupsRepository tournamentGroupsRepository;
     private final TournamentRepository tournamentRepository;
     private final GroupInfoRepository groupInfoRepository;
+    private final TournamentRewardsRepository tournamentRewardsRepository;
 
 
     /**
@@ -58,9 +58,13 @@ public class TournamentServiceImpl implements TournamentService {
         redisService.checkActiveTournament();
         Long activeTournamentId = redisService.getActiveTournamentId();
         Tournament activeTournament = tournamentRepository.findTournamentByTournamentId(activeTournamentId);
+
+
         if (activeTournament == null) {
             throw new UserCanNotEnterTournamentException("Active tournament not found for id: " + activeTournamentId);
         }
+
+        // Check user level and coin
         User user = userRepository.findByUserIdAndLevelGreaterThanEqualAndCoinsGreaterThanEqual(userId, 20, 1000)
                 .orElseThrow(() -> new UserCanNotEnterTournamentException("User does not meet the requirements or does not exist."));
 
@@ -69,14 +73,16 @@ public class TournamentServiceImpl implements TournamentService {
             throw new UserEnteredTournamentBeforeException("User is already registered in the current active tournament.");
         }
 
-        // TODO: User Reward kontrolünü yap.
-
+        // check reward claim
+        if (tournamentRewardsRepository.existsUnclaimedRewardsForUser(userId)) {
+            throw new UserCanNotEnterTournamentException("User has unclaimed rewards and cannot enter a new tournament.");
+        }
         List<TournamentGroups> tournamentGroups = tournamentGroupsRepository.findByTournamentId(activeTournamentId);
 
         if (tournamentGroups.isEmpty()) {
             TournamentGroups newGroup = createTournamentGroup(userId, activeTournament, user);
             log.info("New group created with id: {}", newGroup.getGroupId());
-            return leaderBoardService.getGroupLeaderBoard(newGroup.getGroupId());
+            return leaderBoardService.getGroupLeaderBoardWithGroupId(newGroup.getGroupId());
         }
         for (TournamentGroups tournamentGroup : tournamentGroups) {
             Long groupId = tournamentGroup.getGroupId();
@@ -91,7 +97,7 @@ public class TournamentServiceImpl implements TournamentService {
                     .group(tournamentGroup)
                     .user(user)
                     .score(0)
-                    .hasGroupBegun(false)
+                    .hasGroupBegan(false)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
@@ -109,14 +115,12 @@ public class TournamentServiceImpl implements TournamentService {
             if (groupSize == 5) {
                 groupInfoRepository.updateHasGroupBegunForAllOccurrences(groupId);
             }
-            return leaderBoardService.getGroupLeaderBoard(tournamentGroup.getGroupId());
+            return leaderBoardService.getGroupLeaderBoardWithGroupId(tournamentGroup.getGroupId());
         }
         TournamentGroups newGroup = createTournamentGroup(userId, activeTournament, user);
         log.info("New group created with id: {}", newGroup.getGroupId());
-        return leaderBoardService.getGroupLeaderBoard(newGroup.getGroupId());
+        return leaderBoardService.getGroupLeaderBoardWithGroupId(newGroup.getGroupId());
     }
-
-
 
 
     /**
@@ -138,6 +142,7 @@ public class TournamentServiceImpl implements TournamentService {
         return newTournament.getTournamentId();
     }
 
+
     /**
      * Closes the currently active tournament. This function is scheduled to run daily at 8 PM.
      * It updates the tournament's status to 'Completed' and persists the change to the database.
@@ -151,6 +156,99 @@ public class TournamentServiceImpl implements TournamentService {
             tournamentRepository.save(activeTournament);
         }
         log.info("[TOURNAMENT SERVICE] Tournament closed.");
+    }
+
+
+    /**
+     * Determines the top two players in each active tournament group and assigns rewards based on their rank.
+     * This function fetches the active tournament ID, retrieves all group information for begun groups,
+     * and then calculates the rewards for the top two participants in each group based on their scores.
+     */
+    @Override
+    @Transactional
+    public void specifyRewardWinners() {
+        Long activeTournamentId = redisService.getActiveTournamentId();
+        List<GroupInfo> groupInfos = groupInfoRepository.findByTournamentIdAndGroupBegun(activeTournamentId);
+        Set<Long> uniqueGroupIds = groupInfos.stream()
+                .map(groupInfo -> groupInfo.getGroup().getGroupId())
+                .collect(Collectors.toSet());
+
+        for (Long groupId : uniqueGroupIds) {
+            Set<ZSetOperations.TypedTuple<String>> scores = redisService.getGroupLeaderBoard(groupId);
+            List<String> userIds = scores.stream()
+                    .map(ZSetOperations.TypedTuple::getValue)
+                    .limit(2)
+                    .toList();
+
+            if (!userIds.isEmpty()) {
+                createTournamentReward(userIds.get(0), activeTournamentId, 10000);
+                createTournamentReward(userIds.get(1), activeTournamentId, 5000);
+            }
+        }
+    }
+
+
+    /**
+     * Claims all unclaimed tournament rewards for a given user.
+     * This method performs several operations:
+     * 1. Checks if the user has any unclaimed rewards. If not, throws an exception.
+     * 2. Sums up the total coins won by the user in all unclaimed rewards.
+     * 3. Updates the user's coin balance in the user repository with the total coins won.
+     * 4. Marks all the user's unclaimed rewards as claimed in the rewards repository.
+     *
+     * @param userId The ID of the user claiming the rewards.
+     * @throws IllegalArgumentException If no unclaimed rewards are found for the user.
+     * @throws UserNotFoundException If the user with the given ID does not exist.
+     * @transactional Ensures the entire process is handled in a single transaction, ensuring data integrity.
+     */
+    @Override
+    @Transactional
+    public void claimTournamentsReward(Long userId) {
+        // 1. Check if user has any unclaimed rewards
+        if (!tournamentRewardsRepository.existsByUserIdAndClaimedFalse(userId)) {
+            throw new UnClaimedRewardFoundException("No unclaimed rewards found for user ID: " + userId);
+        }
+
+        // 2. Sum up the coins won by this user in unclaimed rewards
+        int totalCoinsWon = tournamentRewardsRepository.sumUnclaimedCoinsByUserId(userId);
+
+        // 3. Update user's coins and set rewards as claimed
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        user.setCoins(user.getCoins() + totalCoinsWon);
+        userRepository.save(user);
+
+        // Mark all the rewards as claimed
+        tournamentRewardsRepository.markRewardsAsClaimedForUser(userId);
+
+        log.info("User {} has claimed their rewards totaling {} coins.", userId, totalCoinsWon);
+    }
+
+
+    /**
+     * Creates a reward record for a user who participated in a tournament based on their performance.
+     * @param userWithPrefix The composite string key of the user in the format "User:UserId" from the Redis leaderboard.
+     * @param tournamentId The ID of the tournament for which the reward is being specified.
+     * @param coinsWon The amount of coins won by the user, depending on their rank in the leaderboard.
+     */
+    private void createTournamentReward(String userWithPrefix, Long tournamentId, int coinsWon) {
+        Long userId = Long.parseLong(userWithPrefix.split(":")[1]);
+
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid tournament ID"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+
+        TournamentRewards reward = new TournamentRewards();
+        reward.setUser(user);
+        reward.setTournament(tournament);
+        reward.setCoinsWon(coinsWon);
+        reward.setClaimed(false);
+        reward.setCreatedAt(LocalDateTime.now());
+        reward.setUpdatedAt(LocalDateTime.now());
+
+        tournamentRewardsRepository.save(reward);
+        log.info("Reward of {} coins created for user {} in tournament {}", coinsWon, userId, tournamentId);
     }
 
 
@@ -174,7 +272,7 @@ public class TournamentServiceImpl implements TournamentService {
                 .group(newGroup)
                 .user(user)
                 .score(0)
-                .hasGroupBegun(false)
+                .hasGroupBegan(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
