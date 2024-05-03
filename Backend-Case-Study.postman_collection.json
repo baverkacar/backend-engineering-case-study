@@ -1,0 +1,124 @@
+{
+	"info": {
+		"_postman_id": "cc6ece4c-00be-4115-a144-88fc09b34ce0",
+		"name": "Backend-Case-Study",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "20515911"
+	},
+	"item": [
+		{
+			"name": "User-Requests",
+			"item": [
+				{
+					"name": "User Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{username}\",\n  \"email\": \"{useremail}\",\n  \"password\": \"{password}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/users/create"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Level and Coin",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": "http://localhost:8080/users/{userId}/level-up\n"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tournament-Requests",
+			"item": [
+				{
+					"name": "SchedulerTesting",
+					"item": [
+						{
+							"name": "Tournament-Create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": "http://localhost:8080/tournaments/test/create"
+							},
+							"response": []
+						},
+						{
+							"name": "Tournament-Close",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": "http://localhost:8080/tournaments/test/close"
+							},
+							"response": []
+						}
+					],
+					"description": "After making sure that the scheduler was working, I created these endpoints in which I ran the scheduler functions in order to more easily see how the other endpoints worked. It only performs tournament opening and closing operations."
+				},
+				{
+					"name": "Enter-Tournament",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "http://localhost:8080/tournaments/enter/{userId}"
+					},
+					"response": []
+				},
+				{
+					"name": "CountryLeaderBoard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/tournaments/country-leaderboard"
+					},
+					"response": []
+				},
+				{
+					"name": "GroupLeaderBoard",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Rank",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/tournaments/rank/{tournamentId}/{userId}"
+					},
+					"response": []
+				},
+				{
+					"name": "Claim Reward",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/tournaments/claim-rewards/{userId}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/status\n"
+			},
+			"response": []
+		}
+	]
+}
