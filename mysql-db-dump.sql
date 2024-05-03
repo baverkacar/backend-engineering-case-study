@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `users` (
                                       `user_id` BIGINT PRIMARY KEY AUTO_INCREMENT,
                                       `username` VARCHAR(255) NOT NULL UNIQUE,
                                       `email` VARCHAR(255) NOT NULL UNIQUE,
-                                      `password` CHAR(60) NOT NULL,
+                                      `password` CHAR(100) NOT NULL,
                                       `country` VARCHAR(255) NOT NULL,
                                       `level` INT DEFAULT 1,
                                       `coins` INT DEFAULT 5000,
@@ -49,8 +49,11 @@ CREATE TABLE IF NOT EXISTS `tournament_rewards` (
                                                    FOREIGN KEY (`tournament_id`) REFERENCES `tournaments`(`tournament_id`)
 );
 
--- INSERT INTO `tournaments` (`start_time`, `end_time`, `status`)
--- VALUES ('2024-05-01 00:00:00', '2024-05-01 20:00:00', 'Active');
+
+
+
+/*
+                                    !! JUST FOR TESTING !!
 
 INSERT INTO users (username, email, password, country, level, coins, created_at, updated_at)
 VALUES
@@ -67,7 +70,4 @@ VALUES
 
 INSERT INTO users (username, email, password, country, level, coins, created_at, updated_at)
 VALUES ('lowleveluser', 'lowleveluser@email.com', 'hashed_password', 'TURKEY', 15, 900, NOW(), NOW());
-
--- INSERT INTO tournaments (start_time, end_time, status)
--- VALUES ('2024-04-30 00:00:00', '2024-04-30 20:00:00', 'Completed');
-
+*/

@@ -30,8 +30,7 @@ public class GroupInfo {
     @Column(nullable = false)
     private Integer score;
 
-    // TODO: BEGUN'I BEGAN OLARAK DEĞİŞTİR.
-    @Column(name = "has_group_begun", nullable = false)
+    @Column(name = "has_group_began", nullable = false)
     private Boolean hasGroupBegan;
 
     @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

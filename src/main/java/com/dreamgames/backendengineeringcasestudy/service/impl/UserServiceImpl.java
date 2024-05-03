@@ -2,6 +2,7 @@ package com.dreamgames.backendengineeringcasestudy.service.impl;
 
 import com.dreamgames.backendengineeringcasestudy.domain.GroupInfo;
 import com.dreamgames.backendengineeringcasestudy.domain.User;
+import com.dreamgames.backendengineeringcasestudy.exception.NoActiveTournamentException;
 import com.dreamgames.backendengineeringcasestudy.exception.UserExistsException;
 import com.dreamgames.backendengineeringcasestudy.exception.UserNotFoundException;
 import com.dreamgames.backendengineeringcasestudy.mapper.UserMapper;
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
         // Check user existence
         userRepository.findByEmail(request.getEmail())
                 .ifPresent(s -> {
-                    throw new UserExistsException(String.format("Username already exists with given username: %s", request.getUsername()));
+                    throw new UserExistsException(String.format("Email already exists with given username: %s", request.getUsername()));
                 });
 
         userRepository.findByUsername(request.getUsername())
@@ -90,7 +91,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             redisService.checkActiveTournament();
-        } catch (IllegalStateException exception) {
+        } catch (NoActiveTournamentException exception) {
             log.info("No active tournament available: {}", exception.getMessage());
         }
         Long tournamentId = redisService.getActiveTournamentId();

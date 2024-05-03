@@ -58,7 +58,7 @@ public class TournamentController {
      *
      * @return ResponseEntity containing a list of CountryLeaderBoard entries and HTTP status code.
      */
-    @GetMapping("/country-leaderboard/")
+    @GetMapping("/country-leaderboard")
     public ResponseEntity<List<CountryLeaderBoard>> getCountryLeaderBoard() {
         List<CountryLeaderBoard> leaderBoard = leaderBoardService.getCountryLeaderBoardCurrentTournament();
         return new ResponseEntity<>(leaderBoard, HttpStatus.OK);
@@ -72,7 +72,7 @@ public class TournamentController {
      * @param userId The ID of the user whose rank is being queried.
      * @return ResponseEntity containing the user's rank and HTTP status code.
      */
-    @GetMapping("/rank/{tournamentId}/{userId}/")
+    @GetMapping("/rank/{tournamentId}/{userId}")
     public ResponseEntity<Integer> getUserTournamentGroupRank(@PathVariable Long tournamentId, @PathVariable Long userId) {
         Integer rank = leaderBoardService.getUserTournamentGroupRank(tournamentId, userId);
         return new ResponseEntity<>(rank, HttpStatus.OK);
