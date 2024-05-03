@@ -1,5 +1,23 @@
 # Backend Engineering Case Study
 
+# Table of Contents
+1.  [Used Technologies](#used-technologies)
+2. [System Design](#system-design-)
+3. [Table Design](#mysql-tables)
+4. [Architecture Solution](#architecture-solution)
+5. [System Design Solution](#system-design-solutions)
+    - [Data Stored in Redis](#data-stored-in-redis)
+    - [Advantages and Disadvantages](#advantages)
+    - [Schedulers](#schedulers)
+    - [**NOTE**](#note)
+    - [How can we approve](#how-could-i-design-better)
+6. [How to Download and Run](#how-to-download-and-run)
+7. [Folder Structure](#folder-structure-)
+8. [Postman Endpoints](#postman-endpoints)
+
+   
+
+
 ## Used Technologies
 
 1. **Spring** 
@@ -48,6 +66,15 @@ I used the scheduler jobs for the beginning and end of the tournament. In this w
 
 - When the tournament starts, it is added to the **tournaments** SQL table with tournament active status. Additionally, country leadership rankings, active tournament information, and active tournament ID are added to redis.
 - When the tournament ends, the information that the tournament is over is written to the **tournaments** SQL table. Additionally, users who will win rewards are added to the **tournaments_rewards** table. Active tournament information is being updated on Redis.
+
+### Note:
+
+- Thanks to javadoc, you can see what kind of workflow is followed at which endpoint. Javadoc of all functions is available.
+
+
+### How could I design better?
+- Maybe I could create a structure that could work better under high load by using redis pub/sub or another message broker (kafka, redis).
+
 
 ## How to Download and Run
 
