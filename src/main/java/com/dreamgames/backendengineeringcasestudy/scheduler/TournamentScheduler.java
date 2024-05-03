@@ -16,7 +16,7 @@ public class TournamentScheduler {
     private final TournamentService tournamentService;
     private final RedisService redisService;
 
-    @Scheduled(cron = "0 0 0 * * ?") // 00.00 UTC
+    @Scheduled(cron = "0 30 5 * * ?") // 00.00 UTC
     @Transactional
     public void createTournament() {
         log.info("CREATE TOURNAMENT SCHEDULER START");
@@ -26,7 +26,7 @@ public class TournamentScheduler {
         log.info("CREATE TOURNAMENT SCHEDULER END");
     }
 
-    @Scheduled(cron = "0 0 20 * * ?") // 20.00 UTC
+    @Scheduled(cron = "0 30 1 * * ?") // 20.00 UTC
     @Transactional
     public void closeTournament() {
         log.info("CLOSE TOURNAMENT SCHEDULER START");
