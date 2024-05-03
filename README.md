@@ -85,21 +85,13 @@ Clone the project repository from GitHub using the following Git command:
 ```bash
 git clone <repository-url>
 ```
-
-### 2. Configure Database Settings
-You need to set up your database credentials. Open the [application.properties](https://github.com/baverkacar/backend-engineering-case-study/blob/main/src/main/resources/application.properties#:~:text=application.-,properties,-test/java/com) file and update the following entries:
-
-```properties
-spring.datasource.username=<your-root-name>
-spring.datasource.password=<your-password>
-```
-### 3. Run the Application Using Docker
+### 2. Run the Application Using Docker
 
 ```bash
 docker-compose up --build
 ```
 
-### 4. Swagger
+### 3. Swagger
 
 After run go to swagger docs and try any endpoint: **[Swagger Page](http://localhost:8080/swagger-ui/index.html#/)** 
 

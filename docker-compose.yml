@@ -16,9 +16,9 @@ services:
       - mysqldb
       - redis
     environment:
-      SPRING_DATASOURCE_URL: ${DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
+      SPRING_DATASOURCE_URL: jdbc:mysql://case-mysqldb:3306/mysql-db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
 
 
 
@@ -28,9 +28,9 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: 'mysql-db'
-      MYSQL_ROOT_USERNAME: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASS}
-      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_USERNAME: root
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
     networks:
       - 'local-network'
     ports:
