@@ -13,7 +13,7 @@
 
 ## MySQL Tables
 
-![Table Design](https://github.com/baverkacar/backend-engineering-case-study/blob/main/image/system-design.jpeg)
+![Table Design](https://github.com/baverkacar/backend-engineering-case-study/blob/main/image/mysql-db.png)
 
 ## Architecture Solution
 
@@ -60,7 +60,7 @@ git clone <repository-url>
 ```
 
 ### 2. Configure Database Settings
-You need to set up your database credentials. Open the [application.properties](https://github.com/baverkacar/backend-engineering-case-study/blob/main/src/main/resources/application.properties#:~:text=application.-,properties,-test/java/com) file located in `src/main/resources/` and update the following entries:
+You need to set up your database credentials. Open the [application.properties](https://github.com/baverkacar/backend-engineering-case-study/blob/main/src/main/resources/application.properties#:~:text=application.-,properties,-test/java/com) file and update the following entries:
 
 ```properties
 spring.datasource.username=<your-root-name>
@@ -75,3 +75,62 @@ docker-compose up --build
 ### 4. Swagger
 
 After run go to swagger docs and try any endpoint: **[Swagger Page](http://localhost:8080/swagger-ui/index.html#/)** 
+
+## Folder Structure 
+
+```bash
+├── BackendEngineeringCaseStudyApplication.java
+├── config
+│   └── RedisConfig.java
+├── controller
+│   ├── StatusController.java
+│   ├── TournamentController.java
+│   ├── UserController.java
+│   └── advice
+│       └── ControllerExceptionHandler.java
+├── domain
+│   ├── GroupInfo.java
+│   ├── Tournament.java
+│   ├── TournamentGroups.java
+│   ├── TournamentRewards.java
+│   └── User.java
+├── enums
+│   └── Country.java
+├── exception
+│   ├── NoActiveTournamentException.java
+│   ├── UnClaimedRewardFoundException.java
+│   ├── UserCanNotEnterTournamentException.java
+│   ├── UserDidNotEnteredTournamentException.java
+│   ├── UserEnteredTournamentBeforeException.java
+│   ├── UserExistsException.java
+│   └── UserNotFoundException.java
+├── mapper
+│   └── UserMapper.java
+├── model
+│   ├── ExceptionModel.java
+│   ├── leaderboard
+│   │   ├── CountryLeaderBoard.java
+│   │   └── GroupLeaderBoard.java
+│   └── user
+│       ├── CreateUserRequest.java
+│       └── UserProgressResponse.java
+├── repository
+│   ├── GroupInfoRepository.java
+│   ├── TournamentGroupsRepository.java
+│   ├── TournamentRepository.java
+│   ├── TournamentRewardsRepository.java
+│   └── UserRepository.java
+├── scheduler
+│   └── TournamentScheduler.java
+└── service
+    ├── LeaderBoardService.java
+    ├── RedisService.java
+    ├── TournamentService.java
+    ├── UserService.java
+    └── impl
+        ├── LeaderBoardServiceImpl.java
+        ├── RedisServiceImpl.java
+        ├── TournamentServiceImpl.java
+        └── UserServiceImpl.java
+
+```
