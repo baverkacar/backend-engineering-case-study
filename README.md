@@ -11,3 +11,67 @@
 
 ![System Design](https://github.com/baverkacar/backend-engineering-case-study/blob/main/image/system-design.jpeg)
 
+## MySQL Tables
+
+![Table Design](https://github.com/baverkacar/backend-engineering-case-study/blob/main/image/system-design.jpeg)
+
+## Architecture Solution
+
+- The project is structured using a layered architecture approach, which was both a starting point provided in the starter code and a practical choice for rapid development. 
+- Although a more complex and comprehensive structure could benefit from a **Hexagonal** architecture, the layered architecture was sufficient for the needs of this project.
+
+## System Design Solutions
+
+One of the primary concerns during the development of this project was to minimize the load on the database, anticipating high HTTP traffic. To address this, I opted to utilize Redis's real-time caching capabilities, which allowed me to reduce SQL queries and offload critical operations to Redis.
+
+### Data Stored in Redis
+
+#### Group Information:
+1. **Group Leaderboard (Sorted Set):** Group rankings are stored in Redis using Sorted Sets, allowing O(1) access time to user rankings. This structure is beneficial as data is added in a sorted manner.
+2. **User Country Data in Groups (Set):** Stored in Sets, this helps in maintaining group activity status and ensures that no users from the same country are added to the same group twice.
+
+#### Tournament Information:
+1. **Active Tournament Check:** A boolean value indicating the presence of an active tournament is stored, allowing for quick checks without SQL queries.
+2. **Active Tournament ID:** This is stored to provide quick access to the active tournament's ID without querying the SQL database.
+3. **Country Leaderboard (Sorted Set):** This information is stored to quickly update scores for countries whenever a user levels up.
+
+### Advantages
+- **High Access Speed:** Since Redis stores data in RAM, the access speed is very high, significantly improving response times for data retrieval.
+
+### Disadvantages
+- **Single-threaded:** Redis is single-threaded, which can reduce processing speed under multiple operations.
+- **Data Loss Risk:** Redis stores data in RAM initially and writes it to disk later, which poses a risk of data loss in the event of power failure or system shutdowns.
+
+### Schedulers
+
+I used the scheduler jobs for the beginning and end of the tournament. In this way, scheduled jobs running at 00.00 UTC and 20.00 UTC every day enabled the process to be executed in an asynchronous manner.
+
+- When the tournament starts, it is added to the **tournaments** SQL table with tournament active status. Additionally, country leadership rankings, active tournament information, and active tournament ID are added to redis.
+- When the tournament ends, the information that the tournament is over is written to the **tournaments** SQL table. Additionally, users who will win rewards are added to the **tournaments_rewards** table. Active tournament information is being updated on Redis.
+
+## How to Download and Run
+
+Follow these steps to get the project running on your local machine:
+
+### 1. Clone the Repository
+Clone the project repository from GitHub using the following Git command:
+```bash
+git clone <repository-url>
+```
+
+### 2. Configure Database Settings
+You need to set up your database credentials. Open the [application.properties](https://github.com/baverkacar/backend-engineering-case-study/blob/main/src/main/resources/application.properties#:~:text=application.-,properties,-test/java/com) file located in `src/main/resources/` and update the following entries:
+
+```properties
+spring.datasource.username=<your-root-name>
+spring.datasource.password=<your-password>
+```
+### 3. Run the Application Using Docker
+
+```bash
+docker-compose up --build
+```
+
+### 4. Swagger
+
+After run go to swagger docs and try any endpoint: **[Swagger Page](http://localhost:8080/swagger-ui/index.html#/)** 
