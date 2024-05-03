@@ -13,7 +13,7 @@
     - [How can we approve](#how-could-i-design-better)
 6. [How to Download and Run](#how-to-download-and-run)
 7. [Folder Structure](#folder-structure-)
-8. [Postman Endpoints](#postman-endpoints)
+8. [Postman Endpoints](#postman-endpoint-collection)
 
    
 
@@ -161,3 +161,5 @@ After run go to swagger docs and try any endpoint: **[Swagger Page](http://local
         └── UserServiceImpl.java
 
 ```
+
+## [POSTMAN ENDPOINT COLLECTION](https://github.com/baverkacar/backend-engineering-case-study/blob/main/Backend-Case-Study.postman_collection.json)
