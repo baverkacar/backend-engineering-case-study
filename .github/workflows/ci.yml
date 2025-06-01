@@ -53,12 +53,11 @@ jobs:
     - name: Build Docker image
       id: set_image_vars
       run: |
-        PROJECT_VERSION="${{ needs.build-and-test-java.outputs.project_version }}"
 
         IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/userservice-api"
 
         if [[ "${{ github.ref_name }}" == "main" ]]; then
-          TAG="$PROJECT_VERSION"
+          TAG="latesst"
         else
           TAG="${{ github.ref_name }}"
         fi
