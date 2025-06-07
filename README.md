@@ -1,4 +1,4 @@
-# Backend Engineering Case Study
+# Mobile Game Backend Engineering Case Study
 
 # Table of Contents
 1.  [Used Technologies](#used-technologies)
